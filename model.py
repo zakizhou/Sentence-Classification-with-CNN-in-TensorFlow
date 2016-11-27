@@ -8,15 +8,13 @@ import tensorflow as tf
 
 class Config(object):
     def __init__(self):
-        self.batch_size = 128
-        self.embedding_size = 256
+        self.embedding_size = 128
         self.kernel_sizes = [3, 4, 5]
-        self.num_kernels = 10
+        self.num_kernels = 128
 
 
 class TextCNN(object):
     def __init__(self, config, inputs):
-        # batch_size = config.batch_size
         embedding_size = config.embedding_size
         kernel_sizes = config.kernel_sizes
         num_kernels = config.num_kernels
@@ -82,9 +80,3 @@ class TextCNN(object):
             predict = tf.argmax(logits, 1)
             equal = tf.equal(predict, inputs.labels)
             self.validation = tf.reduce_mean(tf.cast(equal, tf.float32))
-
-
-
-
-
-
