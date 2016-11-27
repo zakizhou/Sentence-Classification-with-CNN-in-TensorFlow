@@ -4,17 +4,17 @@ from __future__ import print_function
 
 
 import tensorflow as tf
-from inputs import Inputs, records_inputs, read_and_decode
+from inputs import Inputs
 from model import Config, TextCNN
 
 
 def main(*args, **kwargs):
-    filename_queue = tf.train.string_input_producer(["inputs/train.tfrecords"])
-    input, label = read_and_decode(filename_queue)
-    inputs, labels = records_inputs(input, label)
-    model_inputs = Inputs(inputs, labels)
+    inputs = Inputs()
     config = Config()
-    model = TextCNN(config, model_inputs)
+    with tf.variable_scope("inference") as scope:
+        model = TextCNN(config, inputs)
+        scope.reuse_variables()
+        validation_model = TextCNN(Config, inputs)
 
     init = tf.group(tf.initialize_all_variables(),
                     tf.initialize_local_variables())
