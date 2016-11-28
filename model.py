@@ -8,7 +8,7 @@ import tensorflow as tf
 
 class Config(object):
     def __init__(self):
-        self.embedding_size = 128
+        self.embedding_size = 100
         self.kernel_sizes = [3, 4, 5]
         self.num_kernels = 128
 
@@ -70,13 +70,25 @@ class TextCNN(object):
             logits = tf.nn.xw_plus_b(squeeze, softmax_w, softmax_b)
         with tf.name_scope("loss"):
             cross_entropy_per_example = tf.nn.sparse_softmax_cross_entropy_with_logits(logits, inputs.labels)
-            self.loss = tf.reduce_mean(cross_entropy_per_example)
+            self.__loss = tf.reduce_mean(cross_entropy_per_example)
 
         with tf.name_scope("train"):
             optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.05)
-            self.train = optimizer.minimize(self.loss)
+            self.__train_op = optimizer.minimize(self.__loss)
 
         with tf.name_scope("validatin"):
             predict = tf.argmax(logits, 1)
             equal = tf.equal(predict, inputs.labels)
-            self.validation = tf.reduce_mean(tf.cast(equal, tf.float32))
+            self.__validation_op = tf.reduce_mean(tf.cast(equal, tf.float32))
+
+    @property
+    def cost(self):
+        return self.__loss
+
+    @property
+    def train_op(self):
+        return self.__train_op
+
+    @property
+    def validation_op(self):
+        return self.__validation_op
