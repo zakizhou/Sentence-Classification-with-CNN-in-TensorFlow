@@ -12,9 +12,9 @@ def main(*args, **kwargs):
     inputs = Inputs()
     config = Config()
     with tf.variable_scope("inference") as scope:
-        model = TextCNN(config, inputs)
+        m = TextCNN(config, inputs)
         scope.reuse_variables()
-        validation_model = TextCNN(Config, inputs)
+        mvalid = TextCNN(Config, inputs)
 
     init = tf.group(tf.initialize_all_variables(),
                     tf.initialize_local_variables())
@@ -25,9 +25,12 @@ def main(*args, **kwargs):
     try:
         index = 0
         while not coord.should_stop():
-            _, loss_value = sess.run([model.train, model.loss])
+            _, loss_value = sess.run([m.train_op, m.cost])
             index += 1
             print("step: %d, loss: %f" % (index, loss_value))
+            if index % 5 == 0:
+                accuracy = sess.run(mvalid.validation_op)
+                print("accuracy on validation is:" + str(accuracy))
     except tf.errors.OutOfRangeError:
         print("Done traing:-------Epoch limit reached")
     except KeyboardInterrupt:
